@@ -14,10 +14,75 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Video {
+  id          String    @id @default(uuid(7))
+  code        String    @unique
+  title       String    @db.Text
+  releaseDate DateTime?
+  coverUrl    String?
+  localCover  String? // local path to downloaded cover
+  rating      Float?
+  url         String?
+  extractedAt DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  studioId String?
+  labelId  String?
+
+  studio Studio? @relation(fields: [studioId], references: [id])
+  label  Label?  @relation(fields: [labelId], references: [id])
+
+  actresses VideoActress[]
+  genres    VideoGenre[]
+
+  @@index([releaseDate])
+  @@index([rating])
+  @@index([title(length: 255)])
+}
+
+model Studio {
+  id     String  @id @default(uuid(7))
+  name   String  @unique
+  videos Video[]
+}
+
+model Label {
+  id     String  @id @default(uuid(7))
+  name   String  @unique
+  videos Video[]
+}
+
+model Actress {
+  id     String         @id @default(uuid(7))
+  name   String         @unique
+  videos VideoActress[]
+}
+
+model Genre {
+  id     String       @id @default(uuid(7))
+  name   String       @unique
+  videos VideoGenre[]
+}
+
+model VideoActress {
+  videoId   String
+  actressId String
+
+  video   Video   @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  actress Actress @relation(fields: [actressId], references: [id], onDelete: Cascade)
+
+  @@id([videoId, actressId])
+  @@index([actressId])
+}
+
+model VideoGenre {
+  videoId String
+  genreId String
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([videoId, genreId])
+  @@index([genreId])
 }
