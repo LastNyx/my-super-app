@@ -1,25 +1,36 @@
-# Dependencies and AdonisJS build
+# dependencies (bun install)
 node_modules
-build
-tmp
 
-# Secrets
+# output
+out
+dist
+*.tgz
+
+# code coverage
+coverage
+*.lcov
+
+# logs
+logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# dotenv environment variable files
 .env
-.env.local
-.env.production.local
 .env.development.local
+.env.test.local
+.env.production.local
+.env.local
 
-# Frontend assets compiled code
-public/assets
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
 
-# Build tools specific
-npm-debug.log
-yarn-error.log
-
-# Editors specific
-.fleet
+# IntelliJ based IDEs
 .idea
-.vscode
 
-# Platform specific
+# Finder (MacOS) folder config
 .DS_Store
+
+/generated/prisma
