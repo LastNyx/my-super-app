@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "JAVLibrary Metadata Extractor",
+  "version": "1.0",
+  "description": "Extract metadata from JAVLibrary and copy as JSON.",
+  "permissions": ["activeTab", "scripting", "clipboardWrite"],
+  "action": {
+    "default_title": "Extract Metadata",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*/?v=*","*://*/?v=*/*","<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
