@@ -6,7 +6,10 @@
     "dev": "pnpm --parallel --filter \"./apps/*\" dev",
     "dev:api": "pnpm --filter @my-app/api dev",
     "dev:web": "pnpm --filter @my-app/web dev",
-    "build": "pnpm --filter \"./apps/*\" build"
+    "build": "pnpm --filter \"./apps/*\" build",
+    "db:generate": "pnpm --filter @my-app/api db:generate",
+    "db:migrate": "pnpm --filter @my-app/api db:migrate",
+    "db:studio": "pnpm --filter @my-app/api db:studio"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

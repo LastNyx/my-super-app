@@ -9,6 +9,24 @@ async function getTabData() {
     return result?.[0]?.result || {};
 }
 
+// Clean fields before sending
+function cleanData(raw) {
+    const cleaned = { ...raw };
+
+    // ✅ Fix rating: remove parentheses and convert to number
+    if (typeof cleaned.rating === "string") {
+        cleaned.rating = cleaned.rating
+            .replace(/[()]/g, "")   // remove "(" and ")"
+            .trim();
+
+        const parsed = parseFloat(cleaned.rating);
+        cleaned.rating = isNaN(parsed) ? null : parsed;
+    }
+
+    return cleaned;
+}
+
+
 document.addEventListener("DOMContentLoaded", async () => {
     const output = document.getElementById("output");
     const copyBtn = document.getElementById("copyBtn");
@@ -31,16 +49,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         sendBtn.innerText = "Sending...";
 
         try {
+            const cleanedData = cleanData(data);
+
             const res = await fetch("http://localhost:3333/videos", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: json,
+                body: JSON.stringify(cleanedData),
             });
 
             if (!res.ok) throw new Error(await res.text());
 
             sendBtn.innerText = "Sent!";
         } catch (err) {
+            console.error(err);
             sendBtn.innerText = "Failed!";
         }
 
