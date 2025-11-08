@@ -26,14 +26,29 @@ function cleanData(raw) {
     return cleaned;
 }
 
+async function getPageData() {
+    let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    const result = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => ({
+            metadata: window.__JAVDATA__?.type === "metadata" ? window.__JAVDATA__ : null,
+            streaming: window.__JAVDATA__?.type === "streaming" ? window.__JAVDATA__ : null
+        })
+    });
+
+    return result?.[0]?.result || {};
+}
+
 
 document.addEventListener("DOMContentLoaded", async () => {
     const output = document.getElementById("output");
     const copyBtn = document.getElementById("copyBtn");
     const sendBtn = document.getElementById("sendBtn");
 
-    const data = await getTabData();
-    const json = JSON.stringify(data, null, 2);
+    const { metadata, streaming } = await getPageData();
+    const displayData = metadata || streaming || {};
+    const json = JSON.stringify(displayData, null, 2);
 
     output.textContent = json;
 
@@ -45,26 +60,90 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 
     // ✅ Send to API
-    sendBtn.addEventListener("click", async () => {
-        sendBtn.innerText = "Sending...";
+    // sendBtn.addEventListener("click", async () => {
+    //     sendBtn.innerText = "Sending...";
+    //
+    //     try {
+    //         const cleanedData = cleanData(data);
+    //
+    //         const res = await fetch("http://localhost:3333/videos", {
+    //             method: "POST",
+    //             headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify(cleanedData),
+    //         });
+    //
+    //         if (!res.ok) throw new Error(await res.text());
+    //
+    //         sendBtn.innerText = "Sent!";
+    //     } catch (err) {
+    //         console.error(err);
+    //         sendBtn.innerText = "Failed!";
+    //     }
+    //
+    //     setTimeout(() => (sendBtn.innerText = "Send to API"), 1500);
+    // });
+    if (metadata && metadata.type === "metadata") {
+        // ✅ JAVLibrary metadata
+        sendBtn.innerText = "Send Metadata";
 
-        try {
-            const cleanedData = cleanData(data);
+        sendBtn.addEventListener("click", async () => {
+            sendBtn.innerText = "Sending...";
 
-            const res = await fetch("http://localhost:3333/videos", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(cleanedData),
-            });
+            const payload = cleanData(metadata);
 
-            if (!res.ok) throw new Error(await res.text());
+            try {
+                const res = await fetch("http://localhost:3333/videos", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
 
-            sendBtn.innerText = "Sent!";
-        } catch (err) {
-            console.error(err);
-            sendBtn.innerText = "Failed!";
-        }
+                if (!res.ok) throw new Error(await res.text());
 
-        setTimeout(() => (sendBtn.innerText = "Send to API"), 1500);
-    });
+                sendBtn.innerText = "Sent";
+
+            } catch (err) {
+                console.error(err);
+                sendBtn.innerText = "Failed";
+            }
+
+            setTimeout(() => (sendBtn.innerText = "Send Metadata"), 1500);
+        });
+
+    } else if (streaming && streaming.type === "streaming") {
+        // ✅ Streaming link (123av / javtiful)
+        sendBtn.innerText = "Send Streaming Link";
+
+        sendBtn.addEventListener("click", async () => {
+            sendBtn.innerText = "Sending...";
+
+            const payload = {
+                code: streaming.code,
+                source: streaming.source,
+                url: streaming.url
+            };
+
+            try {
+                const res = await fetch("http://localhost:3333/streaming", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!res.ok) throw new Error(await res.text());
+
+                sendBtn.innerText = "Sent";
+
+            } catch (err) {
+                console.error(err);
+                sendBtn.innerText = "Failed";
+            }
+
+            setTimeout(() => (sendBtn.innerText = "Send Streaming Link"), 1500);
+        });
+
+    } else {
+        // ✅ No supported site → hide the send button
+        sendBtn.style.display = "none";
+    }
 });
