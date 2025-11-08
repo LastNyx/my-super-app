@@ -33,8 +33,9 @@ model Video {
   studio Studio? @relation(fields: [studioId], references: [id])
   label  Label?  @relation(fields: [labelId], references: [id])
 
-  actresses VideoActress[]
-  genres    VideoGenre[]
+  actresses      VideoActress[]
+  genres         VideoGenre[]
+  streamingLinks StreamingLink[]
 
   @@index([releaseDate])
   @@index([rating])
@@ -85,4 +86,17 @@ model VideoGenre {
 
   @@id([videoId, genreId])
   @@index([genreId])
+}
+
+model StreamingLink {
+  id        String   @id @default(uuid(7))
+  videoId   String?
+  code      String // code extracted from page (e.g. IPZZ-734)
+  url       String // page url where streaming is found
+  source    String // "javtiful", "123av", etc.
+  createdAt DateTime @default(now())
+
+  video Video? @relation(fields: [videoId], references: [id])
+
+  @@index([code])
 }

@@ -8,6 +8,7 @@ import { PUBLIC_DIR } from "./config/path";
 import { HttpError } from "./shared/utils/errors";
 import { config } from "dotenv";
 import { join } from "path";
+import {bindStreamingLinkService} from "./modules/library-management/streaming-link/streaming-link.service.ts";
 
 config({
   path: join(process.cwd(), ".env"), // ensures .env from current app
@@ -29,6 +30,22 @@ app.onError((err, c) => {
 
 // Register route
 app.route("/videos", videoFeature);
+
+app.post("/streaming", async (c) => {
+  const body = await c.req.json();
+  const result = bindStreamingLinkService(body);
+
+  return c.json(result);
+});
+
+// ✅ GET /streaming/:code — view all streaming links for a code
+app.get("/streaming/:code", async (c) => {
+  const links = await prisma.streamingLink.findMany({
+    where: { code: c.req.param("code") },
+  });
+
+  return c.json(links);
+});
 
 // Ping test
 app.get("/ping", (c) => c.text("pong"));

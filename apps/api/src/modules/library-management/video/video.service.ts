@@ -47,6 +47,7 @@ export const FindManyVideos = async (query: Record<string, string>) => {
         label: true,
         actresses: { include: { actress: true } },
         genres: { include: { genre: true } },
+        streamingLinks: true
       },
     }),
     prisma.video.count({ where }),
