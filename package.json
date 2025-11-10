@@ -6,6 +6,7 @@
     "dev": "pnpm --parallel --filter \"./apps/*\" dev",
     "dev:api": "pnpm --filter @my-app/api dev",
     "dev:web": "pnpm --filter @my-app/web dev",
+    "dev:web-solid": "pnpm --filter @my-app/web-solid dev",
     "build": "pnpm --filter \"./apps/*\" build",
     "db:generate": "pnpm --filter @my-app/api db:generate",
     "db:migrate": "pnpm --filter @my-app/api db:migrate",

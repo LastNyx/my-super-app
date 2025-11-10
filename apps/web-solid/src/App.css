@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
+body {
+    font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    letter-spacing: 0.02em;
+}
+
+@keyframes pink-glow {
+    from {
+        box-shadow: 0 0 5px #ff3da9, 0 0 10px #ff3da9, 0 0 20px #ff3da9;
+    }
+    to {
+        box-shadow: 0 0 20px #ff3da9, 0 0 40px #ff3da9, 0 0 60px #ff3da9;
+    }
+}
