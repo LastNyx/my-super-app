@@ -4,7 +4,7 @@ import { videoList } from "../../consts/VideoList.ts";
 
 interface CinematicSplashProps {
   from?: "AV" | "MM";
-  to: "AV" | "MM";
+  to?: "AV" | "MM";
   origin?: { x: number; y: number };
   toVideoIndex: number;
   onMidway?: () => void;
@@ -24,24 +24,50 @@ export default function CinematicSplash(props: CinematicSplashProps) {
       ? "text-green-400 drop-shadow-[0_0_10px_#22c55e]"
       : "text-pink-400 drop-shadow-[0_0_10px_#ec4899]";
 
+  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
   onMount(async () => {
-    // Circle out (expansion)
+    // Circle out (expand)
     setOpacity(1);
     setClipPath(clip("160vmax"));
 
-    await new Promise((res) => setTimeout(res, 1100));
+    await sleep(1100);
     props.onMidway?.();
 
-    // Small hold
-    await new Promise((res) => setTimeout(res, 400));
+    // Hold
+    await sleep(400);
 
     // Circle in (close)
-    setOpacity(0);
     setClipPath(clip("0%"));
+    await sleep(900);
 
-    await new Promise((res) => setTimeout(res, 900));
-    props.onComplete?.();
+    // Wait a bit extra to ensure fade visually completes
+    await sleep(400); // 👈 this is the key buffer
+
+    setOpacity(0);
+    await sleep(300); // fade-out transition time
+
+    props.onComplete?.(); // now it's *truly* done
   });
+
+  // onMount(async () => {
+  //   // Circle out (expansion)
+  //   setOpacity(1);
+  //   setClipPath(clip("160vmax"));
+
+  //   await new Promise((res) => setTimeout(res, 1100));
+  //   props.onMidway?.();
+
+  //   // Small hold
+  //   await new Promise((res) => setTimeout(res, 400));
+
+  //   // Circle in (close)
+  //   setOpacity(0);
+  //   setClipPath(clip("0%"));
+
+  //   await new Promise((res) => setTimeout(res, 900));
+  //   props.onComplete?.();
+  // });
 
   const selectedVideo = () => videoList[props.toVideoIndex];
   const showVideo = () => props.to === "AV" && selectedVideo() && !videoError();
