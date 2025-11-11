@@ -31,23 +31,6 @@ export default function Home() {
     });
   };
 
-  // const handleToggle = (e: MouseEvent) => {
-  //   const target = e.currentTarget as HTMLElement;
-  //   const rect = target.getBoundingClientRect();
-  //   const x = e.clientX - rect.left;
-  //   const y = e.clientY - rect.top;
-  //   setOrigin({ x, y });
-
-  //   const to = currentMode() === "MM" ? "AV" : "MM";
-  //   setNextMode(to);
-
-  //   if (to === "AV") {
-  //     setVideoIndex(Math.floor(Math.random() * (videoList?.length ?? 1)));
-  //   }
-
-  //   setShowSplash(true);
-  // };
-
   return (
     <div class="relative w-full h-screen overflow-hidden">
       <Show
@@ -55,7 +38,10 @@ export default function Home() {
         fallback={
           <AVLibraryHome
             onSwitch={handleToggle}
-            initialVideo={splashData.videoIndex ?? 0}
+            initialVideo={
+              splashData.videoIndex ??
+              Math.floor(Math.random() * videoList.length)
+            }
           />
         }
       >
